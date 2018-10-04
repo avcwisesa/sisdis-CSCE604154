@@ -72,7 +72,7 @@ func (r *Router) route (req *Request) *Response {
 
 	for _, handler := range r.handlers {
 		if handler.method == req.method && handler.url.MatchString(req.url.Path) {
-			fmt.Printf("match %s | %s\n",handler.url.String(),req.url.Path)
+			// fmt.Printf("match %s | %s\n",handler.url.String(),req.url.Path)
 			req.regex = handler.url
 			return handler.handle(req)
 		}

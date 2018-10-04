@@ -40,6 +40,7 @@ func main() {
 	router.post(`/hello-world`, handleHelloPost)
 
 	router.get(`/api/(?P<number>\d+)`, handlePlusOne)
+	router.post(`/api/hello`, handleHelloApi)
 
 	for {
 		conn, err := ln.Accept()

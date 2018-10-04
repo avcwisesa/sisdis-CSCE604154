@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"encoding/json"
 	"net/url"
+	"os"
 	"strconv"
 	"io/ioutil"
 	"math/rand"
+	"net/http"
 	"regexp"
 	"strings"
 	"time"
@@ -156,6 +159,67 @@ func handlePlusOne(req *Request) *Response {
 
 	content["apiversion"] = 1
 	content["plusoneret"] = param + 1
+
+	jsonContent, _ := json.Marshal(content)
+
+	return &Response{
+		status: statusOK,
+		contentType: "application/json",
+		content: string(jsonContent),
+	}
+}
+
+func handleHelloApi(req *Request) *Response {
+
+	if req.header["Content-Type"] != "application/json" {
+		return &Response{
+			status: statusBadRequest,
+			contentType: "text/plain",
+			content: "",
+		}
+	}
+
+	now := time.Now()
+	content := make(map[string]interface{})
+
+	var params map[string]interface{}
+
+	json.Unmarshal([]byte(req.body), &params)
+
+	fmt.Println(params)
+	if params["request"] == nil {
+		content["title"] = "Bad Request"
+		content["status"] = 400
+		content["detail"] = "'request' is a required property"
+
+		jsonContent, _ := json.Marshal(content)
+
+		return &Response{
+			status: statusBadRequest,
+			contentType: "application/json",
+			content: string(jsonContent),
+		}
+	}
+
+	timeApi := os.Getenv("TIME_API")
+
+	resp, err := http.Get(timeApi)
+	if err != nil {
+		return &Response{
+			status: statusInternalServerError,
+			contentType: "text/plain",
+			content: err.Error(),
+		}
+	}
+
+	var timeResponse map[string]interface{}
+
+	buf, _ := ioutil.ReadAll(resp.Body)
+	json.Unmarshal(buf, &timeResponse)
+
+	content["apiversion"] = 1
+	content["currentvisit"] = now
+	content["response"] = fmt.Sprintf("Good %s, %s", timeResponse["state"], params["request"])
 
 	jsonContent, _ := json.Marshal(content)
 
