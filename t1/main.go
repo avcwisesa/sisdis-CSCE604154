@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/joho/godotenv"
 
-	"bufio"
 	"log"
 	"net"
 	"fmt"
@@ -29,42 +28,29 @@ func main() {
 		fmt.Println("Server stoped listening.")
 	}()
 
+	router := newRouter()
+
+	router.get(`/`, handleRedirectHello)
+	router.get(`/hello-world`, handleHello)
+	router.get(`/style`, handleStyle)
+	router.get(`/background`, handleBackground)
+	router.get(`/info`, handleInfo)
+
+	router.post(`/`, handleRedirectHello)
+	router.post(`/hello-world`, handleHelloPost)
+
+	router.get(`/api/(?P<number>\d+)`, handlePlusOne)
+
 	for {
 		conn, err := ln.Accept()
 		if err != nil {
 			fmt.Println("Connection error: " + err.Error())
 		}
-		fmt.Println("Connection established!")
+		// fmt.Println("Connection established!")
 
-		handleConnection(conn)
+		router.handleConnection(conn)
 	}
 }
 
-func handleConnection(conn net.Conn) {
-	defer func() {
-		conn.Close()
-		fmt.Println("Connection closed.")
-	}()
-
-	msg := make([]byte, 1024)
-	r := bufio.NewReader(conn)
-	w := bufio.NewWriter(conn)
-
-	len, err := r.Read(msg)
-	if err != nil {
-		fmt.Println("Read error: " + err.Error())
-	}
-	fmt.Printf("Length: %d\n", len)
-	msgString := string(msg[:len])
-
-	if len > 0 {
-		request := parseRequest(msgString)
-
-		resp := handleRequest(request)
-
-		buildResponse(w, resp)
-		w.Flush()
-	}
-}
 
 

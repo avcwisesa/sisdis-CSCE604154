@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"fmt"
 	"bufio"
+	"regexp"
 )
 
 var (
@@ -24,6 +25,7 @@ type Request struct {
 	protocol string
 	header map[string]string
 	body string
+	regex *regexp.Regexp
 }
 
 type Response struct {

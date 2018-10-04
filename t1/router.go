@@ -1,7 +1,11 @@
 package main
 
 import (
+	"bufio"
+	"regexp"
+	"encoding/json"
 	"fmt"
+	"net"
 )
 
 type Router struct {
@@ -28,8 +32,35 @@ func newRouter() *Router {
 	return proto
 }
 
+func (r *Router) handleConnection(conn net.Conn) {
+	defer func() {
+		conn.Close()
+		// fmt.Println("Connection closed.")
+	}()
+
+	msg := make([]byte, 1024)
+	reader := bufio.NewReader(conn)
+	writer := bufio.NewWriter(conn)
+
+	len, err := reader.Read(msg)
+	if err != nil {
+		fmt.Println("Read error: " + err.Error())
+	}
+	// fmt.Printf("Length: %d\n", len)
+	msgString := string(msg[:len])
+
+	if len > 0 {
+		request := parseRequest(msgString)
+
+		resp := r.route(request)
+
+		buildResponse(writer, resp)
+		writer.Flush()
+	}
+}
+
 func (r *Router) route (req *Request) *Response {
-	fmt.Printf("Protocol: %s\nMethod: %s\nURL: %s\n", req.protocol, req.method, req.url)
+	fmt.Printf("%-10v|%-10v| %s\n", req.protocol, req.method, req.url)
 
 	if req.protocol != "HTTP/1.1" && req.protocol != "HTTP/1.0" {
 		return &Response{
@@ -40,7 +71,9 @@ func (r *Router) route (req *Request) *Response {
 	}
 
 	for _, handler := range r.handlers {
-		if handler.method == req.method && handler.url == req.url.Path {
+		if handler.method == req.method && handler.url.MatchString(req.url.Path) {
+			fmt.Printf("match %s | %s\n",handler.url.String(),req.url.Path)
+			req.regex = handler.url
 			return handler.handle(req)
 		}
 
@@ -61,33 +94,57 @@ func (r *Router) route (req *Request) *Response {
 }
 
 func (r *Router) get(url string, handler func(*Request) *Response) {
+	re, _ := regexp.Compile("^" + url + "(/??)$")
+	// fmt.Println(re.String())
+
 	r.handlers = append(r.handlers, &Handler{
 		method: "GET",
-		url: url,
+		url: re,
 		handle: handler,
 	})
 }
 
 func (r *Router) post(url string, handler func(*Request) *Response) {
+	re, _ := regexp.Compile("^" + url + "(/??)$")
+	// fmt.Println(re.String())
+
 	r.handlers = append(r.handlers, &Handler{
 		method: "POST",
-		url: url,
+		url: re,
 		handle: handler,
 	})
 }
 
 func defaultHandleGet(req *Request) *Response {
+
+	content := make(map[string]interface{})
+
+	content["detail"] = "The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again."
+	content["status"] = 404
+	content["title"] = "Not Found"
+
+	jsonContent, _ := json.Marshal(content)
+
 	return &Response{
 		status: statusNotFound,
-		contentType: "text/plain; charset=UTF-8",
-		content: "get",
+		contentType: "application/json",
+		content: string(jsonContent),
 	}
 }
 
 func defaultHandlePost(req *Request) *Response {
+
+	content := make(map[string]interface{})
+
+	content["detail"] = "The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again."
+	content["status"] = 404
+	content["title"] = "Not Found"
+
+	jsonContent, _ := json.Marshal(content)
+
 	return &Response{
 		status: statusNotFound,
-		contentType: "text/plain; charset=UTF-8",
-		content: "post",
+		contentType: "application/json",
+		content: string(jsonContent),
 	}
 }
