@@ -217,7 +217,10 @@ func handleHelloApi(req *Request) *Response {
 	buf, _ := ioutil.ReadAll(resp.Body)
 	json.Unmarshal(buf, &timeResponse)
 
+	count = count + 1
+
 	content["apiversion"] = 1
+	content["count"] = count
 	content["currentvisit"] = now
 	content["response"] = fmt.Sprintf("Good %s, %s", timeResponse["state"], params["request"])
 

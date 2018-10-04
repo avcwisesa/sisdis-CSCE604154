@@ -9,6 +9,8 @@ import (
 	"os"
 )
 
+var count = 0
+
 func main() {
 	err := godotenv.Load()
 	if err != nil {
