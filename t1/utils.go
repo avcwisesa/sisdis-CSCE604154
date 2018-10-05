@@ -35,9 +35,14 @@ type Response struct {
 
 func parseRequest(msgString string) *Request {
 
+	var msgBody string
+
 	msgSlice := strings.Split(msgString, string([]byte{13, 10, 13, 10}))
 	msgHeader := strings.Split(msgSlice[0], "\n")
-	msgBody := msgSlice[1]
+
+	if len(msgSlice) > 1 {
+		msgBody = msgSlice[1]
+	}
 
 	var header map[string]string
 	var reqUrl *url.URL
