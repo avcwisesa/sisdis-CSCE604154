@@ -146,7 +146,7 @@ func handleHelloPost(req *Request) *Response {
 func handlePlusOne(req *Request) *Response {
 
 	path := strings.Split(req.url.Path, "/")
-	param, err := strconv.Atoi(path[2])
+	param, err := strconv.Atoi(path[3])
 	if err != nil {
 		return &Response{
 			status: statusBadRequest,

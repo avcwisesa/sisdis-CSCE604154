@@ -1,0 +1,10 @@
+panic: runtime error: index out of range
+
+goroutine 1 [running]:
+main.parseRequest(0xc000216400, 0x400, 0x400)
+	/root/go/src/sisdis/t1/utils.go:40 +0x519
+main.(*Router).handleConnection(0xc0001c5f58, 0x717ea0, 0xc00017c018)
+	/root/go/src/sisdis/t1/router.go:53 +0x272
+main.main()
+	/root/go/src/sisdis/t1/main.go:54 +0x5ae
+exit status 2
