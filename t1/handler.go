@@ -61,7 +61,7 @@ func handleBackground(req *Request) *Response {
 	if err != nil {
 		return &Response{
 			status: statusInternalServerError,
-			contentType: "image/jpeg",
+			contentType: "text/plain; charset=UTF-8",
 			content: "",
 		}
 	}
@@ -69,6 +69,23 @@ func handleBackground(req *Request) *Response {
 	return &Response{
 		status: statusOK,
 		contentType: "text/html; charset=UTF-8",
+		content: string(file),
+	}
+}
+
+func handleSpesifikasi(req *Request) *Response {
+	file, err := ioutil.ReadFile("spesifikasi.yaml")
+	if err != nil {
+		return &Response{
+			status: statusInternalServerError,
+			contentType: "text/plain; charset=UTF-8",
+			content: "",
+		}
+	}
+
+	return &Response{
+		status: statusOK,
+		contentType: "text/x-yaml; charset=UTF-8",
 		content: string(file),
 	}
 }
@@ -145,17 +162,23 @@ func handleHelloPost(req *Request) *Response {
 
 func handlePlusOne(req *Request) *Response {
 
+	content := make(map[string]interface{})
+
 	path := strings.Split(req.url.Path, "/")
 	param, err := strconv.Atoi(path[3])
 	if err != nil {
+		content["title"] = "Bad Request"
+		content["status"] = 400
+		content["detail"] = "Not a number"
+
+		jsonContent, _ := json.Marshal(content)
+
 		return &Response{
 			status: statusBadRequest,
-			contentType: "text/plain",
-			content: "",
+			contentType: "application/json",
+			content: string(jsonContent),
 		}
 	}
-
-	content := make(map[string]interface{})
 
 	content["apiversion"] = 1
 	content["plusoneret"] = param + 1

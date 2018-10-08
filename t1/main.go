@@ -41,6 +41,7 @@ func main() {
 	router.post(`/`, handleRedirectHello)
 	router.post(`/hello-world`, handleHelloPost)
 
+	router.get(`/api/spesifikasi.yaml`, handleSpesifikasi)
 	router.get(`/api/plusone/(?P<number>\d+)`, handlePlusOne)
 	router.post(`/api/hello`, handleHelloApi)
 
