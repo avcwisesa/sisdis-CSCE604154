@@ -1,82 +1,79 @@
-swagger: '2.0'
+basePath: /api
+consumes:
+- application/json
+host: host1506731561.sisdis.infralabs.cs.ui.ac.id
 info:
-  version: '1.0'
-  title: helloService
+  contact:
+    email: avcwisesa@gmail.com
+    name: Avicenna Wisesa
+    url: http://github.com/avcwisesa
+  description: |-
+    This application is build for class assignment so that course participant
+    can understand deeper about HTTP
+
+    This supposedly comply to all the specification given on problem statement
   license:
     name: GPL
-    url: 'https://www.gnu.org/licenses/gpl-3.0.en.html'
-host: http://host1506731561.sisdis.infralabs.cs.ui.ac.id
-basePath: "/api"
-schemes:
-  - http
-consumes:
-  - application/json
-produces:
-  - application/json
+    url: https://www.gnu.org/licenses/gpl-3.0.en.html
+  title: helloService.
+  version: "1"
 paths:
-  /hello:
+  /api/hello:
     post:
+      consumes:
+      - application/json
       description: Hello
-      tags:
-        - helloBinding
-      operationId: Hello
-      produces:
-        - application/json
+      operationId: hello
       parameters:
-        - name: body
-          in: body
-          required: true
-          description: ''
-          schema:
-            $ref: '#/definitions/Request'
-      responses:
-        '200':
-          description: ''
-          schema:
-            $ref: '#/definitions/Response'
-          examples: {}
-  /plusone/{val}:
-    get:
-      description: "Returns an incremented value"
-      parameters:
-      - name: "val"
-        in: "path"
-        description: "value that need to be incremented"
+      - in: body
+        name: body
         required: true
-        type: "integer"
-        format: "int32"
+      produces:
+      - application/json
       responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Plusoneret"
-        400:
-          description: "Not a number"
-definitions:
-  Request:
-    title: request
-    type: object
-    properties:
-      request:
-        description: ''
-        type: string
-    required:
-      - request
-  Response:
-    title: response
-    type: object
-    properties:
-      response:
-        description: ''
-        type: string
-    required:
-      - response
-  Plusoneret:
-    title: plusoneret
-    type: object
-    properties:
-      plusoneret:
-        description: ''
+        "200":
+          description: successful operation
+        "400":
+          description: request is a required property
+        "500":
+          description: server error
+      schemes:
+      - http
+  /api/plusone/{val}:
+    get:
+      description: Returns an incremented value
+      operationId: plusone
+      parameters:
+      - description: value that need to be incremented
+        format: int32
+        in: path
+        name: val
+        required: true
         type: integer
-    required:
-      - plusoneret
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: successful operation
+        "400":
+          description: Not a number
+      schemes:
+      - http
+  /api/spesifikasi.yaml:
+    get:
+      description: Returns API specifications
+      operationId: spesifikasi
+      produces:
+      - text/x-yaml
+      responses:
+        "200":
+          description: successful operation
+        "500":
+          description: server error
+      schemes:
+      - http
+produces:
+- application/json
+schemes:
+- http
+swagger: "2.0"
