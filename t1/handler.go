@@ -12,6 +12,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"log"
 )
 
 type Handler struct {
@@ -240,7 +241,21 @@ func handleHelloApi(req *Request) *Response {
 	buf, _ := ioutil.ReadAll(resp.Body)
 	json.Unmarshal(buf, &timeResponse)
 
-	count = count + 1
+	epoch := time.Now().UnixNano()
+	file, err := os.OpenFile("count/" + strconv.FormatInt(epoch, 10), os.O_RDONLY|os.O_CREATE, 0666)
+	if err != nil {
+		log.Printf("countIncError: %s", err.Error())
+	}
+	defer file.Close()
+
+	var count int
+	files, err := ioutil.ReadDir("count")
+	if err != nil {
+		log.Printf("countError: %s", err.Error())
+		count = -1
+	} else {
+		count = len(files) - 1
+	}
 
 	content["apiversion"] = 1
 	content["count"] = count
