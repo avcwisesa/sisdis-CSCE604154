@@ -5,10 +5,14 @@ import (
 	"github.com/gin-gonic/gin"
 
 	m "github.com/avcwisesa/sisdis/tugas1/model"
+	c "github.com/avcwisesa/sisdis/tugas1/controller"
 )
 
 // handler holds the structure for Handler
-type handler struct {}
+type handler struct {
+	controller c.Controller
+}
+
 
 // Handler holds the contract for Handler
 type Handler interface {
@@ -53,8 +57,31 @@ func (h * handler) Register(ctx *gin.Context) {
 	default:
 	}
 
+	var request m.RegisterRequest
+	err := ctx.ShouldBindJSON(&saldo)
+	if err != nil {
+		ctx.JSON(400, gin.H{
+			"registerReturn": -99,
+		})
+		return
+	}
+
+	customer := m.Customer{
+		UserID: request.UserID,
+		Name: request.Nama,
+		Balance: 0,
+	}
+
+	_, err := h.controller.Register(ctx, customer)
+	if err != nil {
+		ctx.JSON(400, gin.H{
+			"registerReturn": -4,
+		})
+		return
+	}
+
 	ctx.JSON(200, gin.H{
-		"pingReturn": 1,
+		"registerReturn": 1,
 	})
 
 	return
@@ -85,7 +112,7 @@ func (h * handler) GetSaldo(ctx *gin.Context) {
 		return
 	}
 
-	saldo, err := c.GetSaldo(userID)
+	customer, err := c.GetCustomer(userID)
 	if err != nil {
 		ctx.JSON(500, gin.H{
 			"saldo": -4,
@@ -93,7 +120,7 @@ func (h * handler) GetSaldo(ctx *gin.Context) {
 	}
 
 	ctx.JSON(200, gin.H{
-		"saldo": saldo,
+		"saldo": customer.Balance,
 	})
 
 	return

@@ -9,7 +9,8 @@ type Customer struct {
 	CreatedAt         time.Time  `json:"created_at"`
 	UpdatedAt         time.Time  `json:"updated_at"`
 	DeletedAt         *time.Time `json:"deleted_at"`
-	Domisili          string     `json:"domisili"`
 	UserID            uint       `json:"user_id" gorm:"UNIQUE"`
+	Domisili          string     `json:"domisili"`
+	Name              string     `json:"name"`
 	Balance           uint       `json:"balance"`
 }
