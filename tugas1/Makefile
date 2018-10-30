@@ -8,6 +8,9 @@ dep:
 kill:
 	@kill `cat $(PID)` || true
 
+migrate:
+	go run migration/main.go
+
 run:
 	go run main.go
 
