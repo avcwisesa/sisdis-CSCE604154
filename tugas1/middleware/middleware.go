@@ -1,44 +1,47 @@
 package middleware
 
 import (
-	"fmt"
+	"log"
+	"os"
+	"bytes"
+	"net/http"
+	"io/ioutil"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 )
 
 // define healthcheck middleware
-func quorumHealthCheck(ctx *gin.Context) {
-	select {
-	case <-ctx.Request.Context().Done():
-		return 0, ctx.Err()
-	default:
-	}
-
-	jsonFile, err := os.Open("quorum.json")
-	if err != nil {
-		return 0, err
-	}
-	defer jsonFile.Close()
-
-	buf, _ := ioutil.ReadAll(jsonFile)
-
-	var quorum map[string]string
-	json.Unmarshal(buf, &quorum)
-
-	quorum := 1
-
-	for id, host := range quorum {
-		if id == "1506731561" continue
-		pingReturn, err := ping(host)
+func QuorumHealthCheck() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		jsonFile, err := os.Open("quorum.json")
 		if err != nil {
-			log.Println(err.Error())
+			panic(err)
+		}
+		defer jsonFile.Close()
+
+		buf, _ := ioutil.ReadAll(jsonFile)
+
+		var quorum map[string]string
+		json.Unmarshal(buf, &quorum)
+
+		quorumAmount := 1
+
+		for id, host := range quorum {
+			if id == "1506731561" {
+				continue
+			}
+			pingReturn, err := ping(host)
+			if err != nil {
+				log.Println(err.Error())
+			}
+
+			if pingReturn == 1 {
+				quorumAmount += pingReturn
+			}
 		}
 
-		if pingReturn == 1 {
-			quorum += pingReturn
-		}
+		ctx.Set("quorum", quorumAmount)
 	}
-
-	c.Set("quorum", quorum)
 }
 
 func ping(branch string) (int, error) {

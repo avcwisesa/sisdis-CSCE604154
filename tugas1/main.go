@@ -13,6 +13,8 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/joho/godotenv"
 
+	"github.com/avcwisesa/sisdis/tugas1/middleware"
+
 	h "github.com/avcwisesa/sisdis/tugas1/handler"
 	c "github.com/avcwisesa/sisdis/tugas1/controller"
 	d "github.com/avcwisesa/sisdis/tugas1/database"
@@ -28,6 +30,7 @@ func main() {
 
 	r := gin.Default()
 	r.Use(cors.Default())
+	r.Use(middleware.QuorumHealthCheck())
 
 	dbUsername := os.Getenv("MYSQL_USERNAME")
 	dbPassword := os.Getenv("MYSQL_PASSWORD")
