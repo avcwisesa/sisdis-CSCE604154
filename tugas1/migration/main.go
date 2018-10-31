@@ -48,4 +48,8 @@ func main() {
 	controller := c.New(db)
 
 	db.Migrate(&m.Customer{})
+
+	customer := m.Customer{UserID: "1506731561", Name: "Avicenna", Balance: 10e9 }
+	db.CreateCustomer(customer)
 }
+B

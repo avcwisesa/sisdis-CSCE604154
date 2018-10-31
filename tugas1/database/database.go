@@ -1,7 +1,6 @@
 package database
 
 import (
-	"errors"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -36,8 +35,8 @@ func (d *database) Migrate(i interface{}) {
 func (d *database) CreateCustomer(customer m.Customer) (m.Customer, error) {
 
 	//set created date
-	product.CreatedAt = time.Now()
-	product.UpdatedAt = time.Now()
+	customer.CreatedAt = time.Now()
+	customer.UpdatedAt = time.Now()
 
 	// put product to database
 	if err := d.client.Where(&m.Customer{UserID: customer.UserID}).First(&m.Customer{}).Error; err != nil {
