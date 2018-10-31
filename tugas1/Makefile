@@ -1,6 +1,6 @@
 .PHONY: build start kill compile run
 
-PID = /tmp/app.pid
+PID = /var/run/serverT.pid
 
 dep:
 	govendor sync
@@ -11,11 +11,15 @@ kill:
 migrate:
 	go run migration/main.go
 
+build:
+	go build -o build/serverT
+
 run:
 	go run main.go
 
 compile:
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o build/app main.go
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o build/serverT main.go
 
 start: compile
-	./build/app
+	build/serverT > server.out 2> server.err & echo $$! > $(PID)
+
