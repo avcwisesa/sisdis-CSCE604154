@@ -87,6 +87,9 @@ func (c *controller) GetTotalSaldo(ctx context.Context, userID string) (int, err
 		saldo = int(customer.Balance)
 
 		for id, host := range quorum {
+			if id == c.host {
+				continue
+			}
 			tmpSaldo, err := comm.GetSaldo(host, id)
 			if err != nil {
 				return 0, err

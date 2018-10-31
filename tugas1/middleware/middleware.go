@@ -24,9 +24,10 @@ func quorumHealthCheck(ctx *gin.Context) {
 	var quorum map[string]string
 	json.Unmarshal(buf, &quorum)
 
-	quorum := 0
+	quorum := 1
 
-	for _, host := range quorum {
+	for id, host := range quorum {
+		if id == "1506731561" continue
 		pingReturn, err := ping(host)
 		if err != nil {
 			log.Println(err.Error())

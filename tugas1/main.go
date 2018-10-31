@@ -4,11 +4,15 @@ import (
 	"log"
 	"os"
 
-	"github.com/joho/godotenv"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/jinzhu/gorm"
+	"github.com/joho/godotenv"
 
-	"github.com/avcwisesa/sisdis/tugas1/handler"
+	h "github.com/avcwisesa/sisdis/tugas1/handler"
+	c "github.com/avcwisesa/sisdis/tugas1/controller"
+	d "github.com/avcwisesa/sisdis/tugas1/database"
 )
 
 
@@ -24,14 +28,12 @@ func main() {
 
 	dbUsername := os.Getenv("MYSQL_USERNAME")
 	dbPassword := os.Getenv("MYSQL_PASSWORD")
-	dbHost := os.Getenv("MYSQL_HOST")
 	dbName := os.Getenv("MYSQL_DATABASE_NAME")
 
 	client, err := gorm.Open("mysql",
-		fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local",
+		fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True&loc=Local",
 			dbUsername,
 			dbPassword,
-			dbHost,
 			dbName,
 		),
 	)
@@ -41,11 +43,12 @@ func main() {
 	}
 
 	port := os.Getenv("WEB_PORT")
+	host := os.Getenv("EWALLET_HOST")
 
 	db := d.New(client)
 	controller := c.New(db)
 
-	handler := handler.New()
+	handler := h.New(controller)
 
 	r.POST("/ewallet/ping", handler.Ping)
 	r.POST("/ewallet/register", handler.Register)

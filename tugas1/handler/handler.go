@@ -81,7 +81,7 @@ func (h * handler) Register(ctx *gin.Context) {
 		Balance: 0,
 	}
 
-	_, err := h.controller.Register(ctx, customer)
+	_, err = h.controller.Register(ctx, customer)
 	if err != nil {
 		ctx.JSON(400, gin.H{
 			"registerReturn": -4,
@@ -208,7 +208,7 @@ func (h * handler) Transfer(ctx *gin.Context) {
 
 	var transfer m.TransferRequest
 	err := ctx.ShouldBindJSON(&transfer)
-	iff err != nil {
+	if err != nil {
 		ctx.JSON(400, gin.H{
 			"transferReturn": -99,
 		})
