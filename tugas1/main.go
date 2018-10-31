@@ -26,7 +26,11 @@ func main() {
 
 	handler := handler.New()
 
-	r.GET("/ewallet/ping", handler.Ping)
+	r.POST("/ewallet/ping", handler.Ping)
+	r.POST("/ewallet/register", handler.Register)
+	r.POST("/ewallet/getSaldo", handler.GetSaldo)
+	r.POST("/ewallet/getTotalSaldo", handler.GetTotalSaldo)
+	r.POST("/ewallet/transfer", handler.Transfer)
 
 	r.Run(":" + port)
 }
