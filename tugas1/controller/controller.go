@@ -2,7 +2,7 @@ package controller
 
 import (
 	"encoding/json"
-	"os	"
+	"os"
 	"io/ioutil"
 	"context"
 
@@ -75,7 +75,7 @@ func (c *controller) GetTotalSaldo(ctx context.Context, userID string) (int, err
 	var quorum map[string]string
 	json.Unmarshal(buf, &quorum)
 
-	var saldo uint
+	var saldo int
 
 	if userID == c.host {
 
@@ -84,7 +84,7 @@ func (c *controller) GetTotalSaldo(ctx context.Context, userID string) (int, err
 			return 0, err
 		}
 
-		saldo = customer.Balance
+		saldo = int(customer.Balance)
 
 		for id, host := range quorum {
 			tmpSaldo, err := comm.GetSaldo(host, id)
@@ -97,7 +97,7 @@ func (c *controller) GetTotalSaldo(ctx context.Context, userID string) (int, err
 
 	} else {
 
-		saldo, err := comm.GetTotalSaldo(quorum[userID], userID)
+		saldo, err = comm.GetTotalSaldo(quorum[userID], userID)
 		if err != nil {
 			return 0, err
 		}
@@ -107,10 +107,10 @@ func (c *controller) GetTotalSaldo(ctx context.Context, userID string) (int, err
 	return saldo, nil
 }
 
-func (c *controller) Transfer(ctx context.Context, userID string, nilai uint) (m.Customer, error) {
+func (c *controller) Transfer(ctx context.Context, userID string, nilai uint) (int, error) {
 	select {
 	case <-ctx.Done():
-		return m.Customer{}, ctx.Err()
+		return -99, ctx.Err()
 	default:
 	}
 
@@ -121,7 +121,7 @@ func (c *controller) Transfer(ctx context.Context, userID string, nilai uint) (m
 
 	customer.Balance = customer.Balance + nilai
 
-	customer, err := c.database.UpdateCustomer(customer)
+	customer, err = c.database.UpdateCustomer(customer)
 	if err != nil {
 		return -4, err
 	}

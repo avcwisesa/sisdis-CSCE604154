@@ -1,16 +1,13 @@
 package model
 
 import (
-	"time"
+	"github.com/jinzhu/gorm"
 )
 
 type Customer struct {
-	ID                uint       `json:"id" gorm:"primary_key"`
-	CreatedAt         time.Time  `json:"created_at"`
-	UpdatedAt         time.Time  `json:"updated_at"`
-	DeletedAt         *time.Time `json:"deleted_at"`
-	UserID            string     `json:"user_id" gorm:"UNIQUE"`
-	Domisili          string     `json:"domisili"`
-	Name              string     `json:"name"`
+	gorm.Model
+	UserID            string     `json:"user_id" gorm:"unique;type:varchar(20)"`
+	Domisili          string     `json:"domisili" gorm:"type:varchar(30)"`
+	Name              string     `json:"name" gorm:"type:varchar(40)"`
 	Balance           uint       `json:"balance"`
 }
