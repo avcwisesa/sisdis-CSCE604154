@@ -10,8 +10,9 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/joho/godotenv"
-	"github.com/avcwisesa/sisdis/tugas1/database"
 
+	d "github.com/avcwisesa/sisdis/tugas1/database"
+	c "github.com/avcwisesa/sisdis/tugas1/controller"
 	m "github.com/avcwisesa/sisdis/tugas1/model"
 )
 
@@ -43,7 +44,8 @@ func main() {
 		panic(err)
 	}
 
-	db := database.New(client)
+	db := d.New(client)
+	controller := c.New(db)
 
 	db.Migrate(&m.Customer{})
 }
