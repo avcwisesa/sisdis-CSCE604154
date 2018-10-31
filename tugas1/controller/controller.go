@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"os	"
 	"io/ioutil"
 	"context"
 
@@ -16,24 +17,26 @@ type Controller interface {
 
 type controller struct {
 	database    d.Database
+	host       string
 }
 
-func New(database Database) Controller {
+func New(host string, database d.Database) Controller {
 	return &controller{
 		database:    database,
+		host: host,
 	}
 }
 
 func (c *controller) Register(ctx context.Context, customer m.Customer) (m.Customer, error) {
 	select {
 	case <-ctx.Done():
-		return &m.Customer{}, ctx.Err()
+		return m.Customer{}, ctx.Err()
 	default:
 	}
 
 	_, err := c.database.CreateCustomer(customer)
 	if err != nil {
-		return &m.Customer{}, err
+		return m.Customer{}, err
 	}
 
 	return customer, nil
@@ -42,13 +45,13 @@ func (c *controller) Register(ctx context.Context, customer m.Customer) (m.Custo
 func (c *controller) GetCustomer(ctx context.Context, userID string) (m.Customer, error) {
 	select {
 	case <-ctx.Done():
-		return &m.Customer{}, ctx.Err()
+		return m.Customer{}, ctx.Err()
 	default:
 	}
 
 	customer, err := c.database.GetCustomerByID(userID)
 	if err != nil {
-		return nil, err
+		return m.Customer{}, err
 	}
 
 	return customer, nil
@@ -107,7 +110,7 @@ func (c *controller) GetTotalSaldo(ctx context.Context, userID string) (int, err
 func (c *controller) Transfer(ctx context.Context, userID string, nilai uint) (m.Customer, error) {
 	select {
 	case <-ctx.Done():
-		return &m.Customer{}, ctx.Err()
+		return m.Customer{}, ctx.Err()
 	default:
 	}
 

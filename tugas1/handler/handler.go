@@ -11,7 +11,6 @@ import (
 // handler holds the structure for Handler
 type handler struct {
 	controller c.Controller
-	host       string
 }
 
 // Handler holds the contract for Handler
@@ -29,10 +28,9 @@ type Handler interface {
 }
 
 // New is a function for creating handler
-func New(host string, controller c.Controller) Handler {
+func New(hcontroller c.Controller) Handler {
 	return &handler{
 		controller: controller,
-		host: host,
 	}
 }
 

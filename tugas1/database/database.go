@@ -18,6 +18,9 @@ type database struct {
 type Database interface {
 	// Migrate should holds implementation for migrating any struct to database table
 	Migrate(interface{})
+	CreateCustomer(m.Customer) (m.Customer, error)
+	GetCustomerByID(string) (m.Customer, error)
+	UpdateCustomer(m.Customer) (m.Customer, error)
 }
 
 // New is used to initiate interface for the DB client
