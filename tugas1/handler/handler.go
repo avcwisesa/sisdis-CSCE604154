@@ -60,7 +60,7 @@ func (h * handler) Register(ctx *gin.Context) {
 	}
 
 	quorum := ctx.MustGet("quorum").(int)
-	if quorum <= (h.quorum/2) + 1 {
+	if quorum < (h.quorum/2) + 1 {
 		ctx.JSON(200, gin.H{
 			"transferReturn": -2,
 		})
@@ -106,7 +106,7 @@ func (h * handler) GetSaldo(ctx *gin.Context) {
 	}
 
 	quorum := ctx.MustGet("quorum").(int)
-	if quorum <= (h.quorum/2) + 1 {
+	if quorum < (h.quorum/2) + 1 {
 		ctx.JSON(200, gin.H{
 			"saldo": -2,
 		})
