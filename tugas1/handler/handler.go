@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"github.com/gin-gonic/gin"
 
 	m "github.com/avcwisesa/sisdis/tugas1/model"

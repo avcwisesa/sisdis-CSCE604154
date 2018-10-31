@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"log"
 	"encoding/json"
 	"os"
 	"io/ioutil"
