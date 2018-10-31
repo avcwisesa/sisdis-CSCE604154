@@ -131,7 +131,7 @@ func (h * handler) GetSaldo(ctx *gin.Context) {
 	if err != nil {
 		log.Println(err)
 		ctx.JSON(500, gin.H{
-			"saldo": -4,
+			"saldo": -1,
 		})
 		return
 	}
@@ -173,7 +173,7 @@ func (h * handler) GetTotalSaldo(ctx *gin.Context) {
 	if err != nil {
 		log.Println(err)
 		ctx.JSON(500, gin.H{
-			"saldo": -4,
+			"saldo": saldo,
 		})
 		return
 	}

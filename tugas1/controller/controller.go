@@ -131,7 +131,7 @@ func (c *controller) Transfer(ctx context.Context, userID string, nilai uint) (i
 	customer, err := c.database.GetCustomerByID(userID)
 	if err != nil {
 		log.Println(err)
-		return -4, err
+		return -1, err
 	}
 
 	customer.Balance = customer.Balance + nilai
@@ -139,7 +139,7 @@ func (c *controller) Transfer(ctx context.Context, userID string, nilai uint) (i
 	customer, err = c.database.UpdateCustomer(customer)
 	if err != nil {
 		log.Println(err)
-		return -4, err
+		return -1, err
 	}
 
 	return 1, nil
@@ -155,7 +155,7 @@ func (c *controller) TransferMinus(ctx context.Context, userID string, nilai uin
 	customer, err := c.database.GetCustomerByID(userID)
 	if err != nil {
 		log.Println(err)
-		return -4, err
+		return -1, err
 	}
 
 	customer.Balance = customer.Balance - nilai
@@ -163,7 +163,7 @@ func (c *controller) TransferMinus(ctx context.Context, userID string, nilai uin
 	customer, err = c.database.UpdateCustomer(customer)
 	if err != nil {
 		log.Println(err)
-		return -4, err
+		return -1, err
 	}
 
 	return 1, nil
