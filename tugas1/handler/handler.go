@@ -26,6 +26,7 @@ type Handler interface {
 	GetTotalSaldo(*gin.Context)
 	// TransferHandler should handle balance mutation event
 	Transfer(*gin.Context)
+	TransferMinus(*gin.Context)
 }
 
 // New is a function for creating handler
@@ -218,6 +219,55 @@ func (h * handler) Transfer(ctx *gin.Context) {
 	}
 
 	transferReturn, err := h.controller.Transfer(ctx, transfer.UserID, transfer.Nilai)
+	if err != nil {
+		log.Println(err)
+		ctx.JSON(500, gin.H{
+			"transferReturn": transferReturn,
+		})
+		return
+	}
+
+	ctx.JSON(200, gin.H{
+		"transferReturn": transferReturn,
+	})
+
+	return
+}
+
+func (h * handler) TransferMinus(ctx *gin.Context) {
+	select {
+	case <-ctx.Request.Context().Done():
+		ctx.JSON(408, metaContextTimeout.Message)
+		return
+	default:
+	}
+
+	quorum := ctx.MustGet("quorum").(int)
+	if quorum < (h.quorum/2) + 1 {
+		ctx.JSON(200, gin.H{
+			"transferReturn": -2,
+		})
+		return
+	}
+
+	var transfer m.TransferRequest
+	err := ctx.ShouldBindJSON(&transfer)
+	if err != nil {
+		log.Println(err)
+		ctx.JSON(400, gin.H{
+			"transferReturn": -99,
+		})
+		return
+	}
+
+	if transfer.Nilai > 10e9 {
+		ctx.JSON(400, gin.H{
+			"transferReturn": -5,
+		})
+		return
+	}
+
+	transferReturn, err := h.controller.TransferMinus(ctx, transfer.UserID, transfer.Nilai)
 	if err != nil {
 		log.Println(err)
 		ctx.JSON(500, gin.H{

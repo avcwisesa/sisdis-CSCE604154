@@ -72,6 +72,7 @@ func main() {
 	r.POST("/ewallet/getSaldo", handler.GetSaldo)
 	r.POST("/ewallet/getTotalSaldo", handler.GetTotalSaldo)
 	r.POST("/ewallet/transfer", handler.Transfer)
+	r.POST("/ewallet/transferMinus", handler.TransferMinus)
 
 	r.Run(":" + port)
 }

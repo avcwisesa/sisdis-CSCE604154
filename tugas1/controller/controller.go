@@ -17,6 +17,7 @@ type Controller interface {
 	GetCustomer(context.Context, string) (m.Customer, error)
 	GetTotalSaldo(context.Context, string) (int, error)
 	Transfer(context.Context, string, uint) (int, error)
+	TransferMinus(context.Context, string, uint) (int, error)
 }
 
 type controller struct {
@@ -134,6 +135,30 @@ func (c *controller) Transfer(ctx context.Context, userID string, nilai uint) (i
 	}
 
 	customer.Balance = customer.Balance + nilai
+
+	customer, err = c.database.UpdateCustomer(customer)
+	if err != nil {
+		log.Println(err)
+		return -4, err
+	}
+
+	return 1, nil
+}
+
+func (c *controller) TransferMinus(ctx context.Context, userID string, nilai uint) (int, error) {
+	select {
+	case <-ctx.Done():
+		return -99, ctx.Err()
+	default:
+	}
+
+	customer, err := c.database.GetCustomerByID(userID)
+	if err != nil {
+		log.Println(err)
+		return -4, err
+	}
+
+	customer.Balance = customer.Balance - nilai
 
 	customer, err = c.database.UpdateCustomer(customer)
 	if err != nil {
