@@ -22,7 +22,28 @@ func main() {
 	r := gin.Default()
 	r.Use(cors.Default())
 
+	dbUsername := os.Getenv("MYSQL_USERNAME")
+	dbPassword := os.Getenv("MYSQL_PASSWORD")
+	dbHost := os.Getenv("MYSQL_HOST")
+	dbName := os.Getenv("MYSQL_DATABASE_NAME")
+
+	client, err := gorm.Open("mysql",
+		fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8&parseTime=True&loc=Local",
+			dbUsername,
+			dbPassword,
+			dbHost,
+			dbName,
+		),
+	)
+	if err != nil {
+		log.Println("Error connecting to DB")
+		panic(err)
+	}
+
 	port := os.Getenv("WEB_PORT")
+
+	db := d.New(client)
+	controller := c.New(db)
 
 	handler := handler.New()
 

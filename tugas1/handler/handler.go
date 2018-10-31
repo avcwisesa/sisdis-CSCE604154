@@ -14,7 +14,6 @@ type handler struct {
 	host       string
 }
 
-
 // Handler holds the contract for Handler
 type Handler interface {
 	// Ping should handle healthcheck in top level routing
@@ -30,8 +29,11 @@ type Handler interface {
 }
 
 // New is a function for creating handler
-func New() Handler {
-	return &handler{}
+func New(host string, controller c.Controller) Handler {
+	return &handler{
+		controller: controller,
+		host: host,
+	}
 }
 
 // Ping if a function for handling healthcheck in top level routing

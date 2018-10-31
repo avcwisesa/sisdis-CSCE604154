@@ -10,6 +10,10 @@ import (
 	comm "github.com/avcwisesa/sisdis/tugas1/communicator"
 )
 
+type Controller interface {
+	Register(context.Context, m.Customer) (m.Customer, error)
+}
+
 type controller struct {
 	database    d.Database
 }
@@ -22,7 +26,7 @@ func New(database Database) Controller {
 
 func (c *controller) Register(ctx context.Context, customer m.Customer) (m.Customer, error) {
 	select {
-	case <-ctx.Request.Context().Done():
+	case <-ctx.Done():
 		return &m.Customer{}, ctx.Err()
 	default:
 	}
@@ -37,7 +41,7 @@ func (c *controller) Register(ctx context.Context, customer m.Customer) (m.Custo
 
 func (c *controller) GetCustomer(ctx context.Context, userID string) (m.Customer, error) {
 	select {
-	case <-ctx.Request.Context().Done():
+	case <-ctx.Done():
 		return &m.Customer{}, ctx.Err()
 	default:
 	}
@@ -52,7 +56,7 @@ func (c *controller) GetCustomer(ctx context.Context, userID string) (m.Customer
 
 func (c *controller) GetTotalSaldo(ctx context.Context, userID string) (int, error) {
 	select {
-	case <-ctx.Request.Context().Done():
+	case <-ctx.Done():
 		return 0, ctx.Err()
 	default:
 	}
@@ -102,7 +106,7 @@ func (c *controller) GetTotalSaldo(ctx context.Context, userID string) (int, err
 
 func (c *controller) Transfer(ctx context.Context, userID string, nilai uint) (m.Customer, error) {
 	select {
-	case <-ctx.Request.Context().Done():
+	case <-ctx.Done():
 		return &m.Customer{}, ctx.Err()
 	default:
 	}
