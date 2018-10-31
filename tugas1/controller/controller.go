@@ -13,6 +13,9 @@ import (
 
 type Controller interface {
 	Register(context.Context, m.Customer) (m.Customer, error)
+	GetCustomer(context.Context, string) (m.Customer, error)
+	GetTotalSaldo(context.Context, string) (int, error)
+	Transfer(context.Context, string, uint) (int, error)
 }
 
 type controller struct {

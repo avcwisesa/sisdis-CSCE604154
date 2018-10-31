@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"strconv"
 	"github.com/gin-gonic/gin"
 
 	m "github.com/avcwisesa/sisdis/tugas1/model"
@@ -11,6 +10,7 @@ import (
 // handler holds the structure for Handler
 type handler struct {
 	controller c.Controller
+	quorum int
 }
 
 // Handler holds the contract for Handler
@@ -18,19 +18,20 @@ type Handler interface {
 	// Ping should handle healthcheck in top level routing
 	Ping(*gin.Context)
 	// RegisterHandler should handle new customer register
-	RegisterHandler(*gin.Context)
+	Register(*gin.Context)
 	// GetSaldoHandler should handle get balance
-	GetSaldoHandler(*gin.Context)
+	GetSaldo(*gin.Context)
 	// GetTotalSaldoHandler should handle get balance from all branches
-	GetTotalSaldoHandler(*gin.Context)
+	GetTotalSaldo(*gin.Context)
 	// TransferHandler should handle balance mutation event
-	TransferHandler(*gin.Context)
+	Transfer(*gin.Context)
 }
 
 // New is a function for creating handler
-func New(hcontroller c.Controller) Handler {
+func New(quorum int, controller c.Controller) Handler {
 	return &handler{
 		controller: controller,
+		quorum: quorum,
 	}
 }
 
@@ -58,7 +59,7 @@ func (h * handler) Register(ctx *gin.Context) {
 	default:
 	}
 
-	quorum := c.MustGet("quorum").(int)
+	quorum := ctx.MustGet("quorum").(int)
 	if quorum <= (h.quorum/2) + 1 {
 		ctx.JSON(200, gin.H{
 			"transferReturn": -2,
@@ -67,7 +68,7 @@ func (h * handler) Register(ctx *gin.Context) {
 	}
 
 	var request m.RegisterRequest
-	err := ctx.ShouldBindJSON(&saldo)
+	err := ctx.ShouldBindJSON(&request)
 	if err != nil {
 		ctx.JSON(400, gin.H{
 			"registerReturn": -99,
@@ -104,7 +105,7 @@ func (h * handler) GetSaldo(ctx *gin.Context) {
 	default:
 	}
 
-	quorum := c.MustGet("quorum").(int)
+	quorum := ctx.MustGet("quorum").(int)
 	if quorum <= (h.quorum/2) + 1 {
 		ctx.JSON(200, gin.H{
 			"saldo": -2,
@@ -121,15 +122,7 @@ func (h * handler) GetSaldo(ctx *gin.Context) {
 		return
 	}
 
-	userID, err := strconv.Atoi(request.UserID)
-	if err != nil {
-		ctx.JSON(400, gin.H{
-			"saldo": -99,
-		})
-		return
-	}
-
-	customer, err := h.controller.GetCustomer(ctx, userID)
+	customer, err := h.controller.GetCustomer(ctx, request.UserID)
 	if err != nil {
 		ctx.JSON(500, gin.H{
 			"saldo": -4,
@@ -151,7 +144,7 @@ func (h * handler) GetTotalSaldo(ctx *gin.Context) {
 	default:
 	}
 
-	quorum := c.MustGet("quorum").(int)
+	quorum := ctx.MustGet("quorum").(int)
 	if quorum < h.quorum {
 		ctx.JSON(200, gin.H{
 			"saldo": -2,
@@ -168,15 +161,7 @@ func (h * handler) GetTotalSaldo(ctx *gin.Context) {
 		return
 	}
 
-	userID, err := strconv.Atoi(request.UserID)
-	if err != nil {
-		ctx.JSON(400, gin.H{
-			"saldo": -99,
-		})
-		return
-	}
-
-	saldo, err := h.controller.GetTotalSaldo(ctx, userID)
+	saldo, err := h.controller.GetTotalSaldo(ctx, request.UserID)
 	if err != nil {
 		ctx.JSON(500, gin.H{
 			"saldo": -4,
@@ -198,7 +183,7 @@ func (h * handler) Transfer(ctx *gin.Context) {
 	default:
 	}
 
-	quorum := c.MustGet("quorum").(int)
+	quorum := ctx.MustGet("quorum").(int)
 	if quorum < (h.quorum/2) + 1 {
 		ctx.JSON(200, gin.H{
 			"transferReturn": -2,

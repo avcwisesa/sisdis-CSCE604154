@@ -1,8 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
+	"io/ioutil"
+	"encoding/json"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
@@ -42,13 +45,24 @@ func main() {
 		panic(err)
 	}
 
+	jsonFile, err := os.Open("quorum.json")
+	if err != nil {
+		panic(err)
+	}
+	defer jsonFile.Close()
+
+	buf, _ := ioutil.ReadAll(jsonFile)
+
+	var quorum map[string]string
+	json.Unmarshal(buf, &quorum)
+
 	port := os.Getenv("WEB_PORT")
 	host := os.Getenv("EWALLET_HOST")
 
 	db := d.New(client)
-	controller := c.New(db)
+	controller := c.New(host, db)
 
-	handler := h.New(controller)
+	handler := h.New(len(quorum), controller)
 
 	r.POST("/ewallet/ping", handler.Ping)
 	r.POST("/ewallet/register", handler.Register)
