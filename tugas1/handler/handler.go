@@ -11,6 +11,7 @@ import (
 // handler holds the structure for Handler
 type handler struct {
 	controller c.Controller
+	host       string
 }
 
 
@@ -57,6 +58,14 @@ func (h * handler) Register(ctx *gin.Context) {
 	default:
 	}
 
+	quorum := c.MustGet("quorum").(int)
+	if quorum <= (h.quorum/2) + 1 {
+		ctx.JSON(200, gin.H{
+			"transferReturn": -2,
+		})
+		return
+	}
+
 	var request m.RegisterRequest
 	err := ctx.ShouldBindJSON(&saldo)
 	if err != nil {
@@ -95,8 +104,16 @@ func (h * handler) GetSaldo(ctx *gin.Context) {
 	default:
 	}
 
-	var saldo m.SaldoRequest
-	err := ctx.ShouldBindJSON(&saldo)
+	quorum := c.MustGet("quorum").(int)
+	if quorum <= (h.quorum/2) + 1 {
+		ctx.JSON(200, gin.H{
+			"saldo": -2,
+		})
+		return
+	}
+
+	var request m.SaldoRequest
+	err := ctx.ShouldBindJSON(&request)
 	if err != nil {
 		ctx.JSON(400, gin.H{
 			"saldo": -99,
@@ -104,7 +121,7 @@ func (h * handler) GetSaldo(ctx *gin.Context) {
 		return
 	}
 
-	userID, err := strconv.Atoi(saldo.UserID)
+	userID, err := strconv.Atoi(request.UserID)
 	if err != nil {
 		ctx.JSON(400, gin.H{
 			"saldo": -99,
@@ -112,7 +129,7 @@ func (h * handler) GetSaldo(ctx *gin.Context) {
 		return
 	}
 
-	customer, err := c.GetCustomer(userID)
+	customer, err := h.controller.GetCustomer(ctx, userID)
 	if err != nil {
 		ctx.JSON(500, gin.H{
 			"saldo": -4,
@@ -134,13 +151,40 @@ func (h * handler) GetTotalSaldo(ctx *gin.Context) {
 	default:
 	}
 
-	var saldo m.SaldoRequest
+	quorum := c.MustGet("quorum").(int)
+	if quorum < h.quorum {
+		ctx.JSON(200, gin.H{
+			"saldo": -2,
+		})
+		return
+	}
 
+	var request m.SaldoRequest
+	err := ctx.ShouldBindJSON(&request)
+	if err != nil {
+		ctx.JSON(400, gin.H{
+			"saldo": -99,
+		})
+		return
+	}
 
-	// check domisili
+	userID, err := strconv.Atoi(request.UserID)
+	if err != nil {
+		ctx.JSON(400, gin.H{
+			"saldo": -99,
+		})
+		return
+	}
+
+	saldo, err := h.controller.GetTotalSaldo(ctx, userID)
+	if err != nil {
+		ctx.JSON(500, gin.H{
+			"saldo": -4,
+		})
+	}
 
 	ctx.JSON(200, gin.H{
-		"saldo": 1,
+		"saldo": saldo,
 	})
 
 	return
@@ -154,6 +198,14 @@ func (h * handler) Transfer(ctx *gin.Context) {
 	default:
 	}
 
+	quorum := c.MustGet("quorum").(int)
+	if quorum < (h.quorum/2) + 1 {
+		ctx.JSON(200, gin.H{
+			"transferReturn": -2,
+		})
+		return
+	}
+
 	var transfer m.TransferRequest
 	err := ctx.ShouldBindJSON(&transfer)
 	iff err != nil {
@@ -163,14 +215,22 @@ func (h * handler) Transfer(ctx *gin.Context) {
 		return
 	}
 
-	// check transfer value, if x < 0 || > 1M --> -5
+	if transfer.Nilai > 10e9 {
+		ctx.JSON(400, gin.H{
+			"transferReturn": -5,
+		})
+		return
+	}
 
-	// get user from db, else --> -1
-
-	// db error --> -4
+	transferReturn, err := h.controller.Transfer(ctx, transfer.UserID, transfer.Nilai)
+	if err != nil {
+		ctx.JSON(500, gin.H{
+			"transferReturn": transferReturn,
+		})
+	}
 
 	ctx.JSON(200, gin.H{
-		"transferReturn": 1,
+		"transferReturn": transferReturn,
 	})
 
 	return

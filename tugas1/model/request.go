@@ -1,7 +1,7 @@
 package model
 
 type RegisterRequest struct {
-	UserID			  uint       `json:"user_id"`
+	UserID			  string     `json:"user_id"`
 	Nama              string     `json:"nama"`
 }
 
