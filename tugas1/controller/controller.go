@@ -39,6 +39,7 @@ func (c *controller) Register(ctx context.Context, customer m.Customer) (m.Custo
 
 	_, err := c.database.CreateCustomer(customer)
 	if err != nil {
+		log.Println(err)
 		return m.Customer{}, err
 	}
 
@@ -54,6 +55,7 @@ func (c *controller) GetCustomer(ctx context.Context, userID string) (m.Customer
 
 	customer, err := c.database.GetCustomerByID(userID)
 	if err != nil {
+		log.Println(err)
 		return m.Customer{}, err
 	}
 
@@ -69,6 +71,7 @@ func (c *controller) GetTotalSaldo(ctx context.Context, userID string) (int, err
 
 	jsonFile, err := os.Open("quorum.json")
 	if err != nil {
+		log.Println(err)
 		return 0, err
 	}
 	defer jsonFile.Close()
@@ -84,6 +87,7 @@ func (c *controller) GetTotalSaldo(ctx context.Context, userID string) (int, err
 
 		customer, err := c.GetCustomer(ctx, userID)
 		if err != nil {
+			log.Println(err)
 			return 0, err
 		}
 
@@ -95,6 +99,7 @@ func (c *controller) GetTotalSaldo(ctx context.Context, userID string) (int, err
 			}
 			tmpSaldo, err := comm.GetSaldo(host, id)
 			if err != nil {
+				log.Println(err)
 				return 0, err
 			}
 
@@ -105,6 +110,7 @@ func (c *controller) GetTotalSaldo(ctx context.Context, userID string) (int, err
 
 		saldo, err = comm.GetTotalSaldo(quorum[userID], userID)
 		if err != nil {
+			log.Println(err)
 			return 0, err
 		}
 
@@ -122,6 +128,7 @@ func (c *controller) Transfer(ctx context.Context, userID string, nilai uint) (i
 
 	customer, err := c.database.GetCustomerByID(userID)
 	if err != nil {
+		log.Println(err)
 		return -4, err
 	}
 
@@ -129,6 +136,7 @@ func (c *controller) Transfer(ctx context.Context, userID string, nilai uint) (i
 
 	customer, err = c.database.UpdateCustomer(customer)
 	if err != nil {
+		log.Println(err)
 		return -4, err
 	}
 

@@ -70,6 +70,7 @@ func (h * handler) Register(ctx *gin.Context) {
 	var request m.RegisterRequest
 	err := ctx.ShouldBindJSON(&request)
 	if err != nil {
+		log.Println(err)
 		ctx.JSON(400, gin.H{
 			"registerReturn": -99,
 		})
@@ -84,6 +85,7 @@ func (h * handler) Register(ctx *gin.Context) {
 
 	_, err = h.controller.Register(ctx, customer)
 	if err != nil {
+		log.Println(err)
 		ctx.JSON(400, gin.H{
 			"registerReturn": -4,
 		})
@@ -116,6 +118,7 @@ func (h * handler) GetSaldo(ctx *gin.Context) {
 	var request m.SaldoRequest
 	err := ctx.ShouldBindJSON(&request)
 	if err != nil {
+		log.Println(err)
 		ctx.JSON(400, gin.H{
 			"saldo": -99,
 		})
@@ -124,9 +127,11 @@ func (h * handler) GetSaldo(ctx *gin.Context) {
 
 	customer, err := h.controller.GetCustomer(ctx, request.UserID)
 	if err != nil {
+		log.Println(err)
 		ctx.JSON(500, gin.H{
 			"saldo": -4,
 		})
+		return
 	}
 
 	ctx.JSON(200, gin.H{
@@ -155,6 +160,7 @@ func (h * handler) GetTotalSaldo(ctx *gin.Context) {
 	var request m.SaldoRequest
 	err := ctx.ShouldBindJSON(&request)
 	if err != nil {
+		log.Println(err)
 		ctx.JSON(400, gin.H{
 			"saldo": -99,
 		})
@@ -163,9 +169,11 @@ func (h * handler) GetTotalSaldo(ctx *gin.Context) {
 
 	saldo, err := h.controller.GetTotalSaldo(ctx, request.UserID)
 	if err != nil {
+		log.Println(err)
 		ctx.JSON(500, gin.H{
 			"saldo": -4,
 		})
+		return
 	}
 
 	ctx.JSON(200, gin.H{
@@ -194,6 +202,7 @@ func (h * handler) Transfer(ctx *gin.Context) {
 	var transfer m.TransferRequest
 	err := ctx.ShouldBindJSON(&transfer)
 	if err != nil {
+		log.Println(err)
 		ctx.JSON(400, gin.H{
 			"transferReturn": -99,
 		})
@@ -209,9 +218,11 @@ func (h * handler) Transfer(ctx *gin.Context) {
 
 	transferReturn, err := h.controller.Transfer(ctx, transfer.UserID, transfer.Nilai)
 	if err != nil {
+		log.Println(err)
 		ctx.JSON(500, gin.H{
 			"transferReturn": transferReturn,
 		})
+		return
 	}
 
 	ctx.JSON(200, gin.H{
