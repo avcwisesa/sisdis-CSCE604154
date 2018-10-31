@@ -55,7 +55,7 @@ func (d *database) CreateCustomer(customer m.Customer) (m.Customer, error) {
 func (d *database) GetCustomerByID(id string) (m.Customer, error) {
 
 	var customer m.Customer
-	if err := d.client.First(&customer, id).Error; err != nil {
+	if err := d.client.Where("user_id = ?", id).First(&customer).Error; err != nil {
 		return m.Customer{}, err
 	}
 
@@ -65,7 +65,7 @@ func (d *database) GetCustomerByID(id string) (m.Customer, error) {
 func (d *database) UpdateCustomer(customer m.Customer) (m.Customer, error) {
 
 	var customerOld m.Customer
-	if err := d.client.First(&customerOld, customer.UserID).Error; err != nil {
+	if err := d.client.Where("user_id = ?", customer.UserID).First(&customerOld).Error; err != nil {
 		return m.Customer{}, err
 	}
 
